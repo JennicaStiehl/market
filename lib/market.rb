@@ -62,4 +62,39 @@ class Market
     # total
   end
 
+  def sell(item, amount)
+    answer = false
+    vendors = vendors_that_sell(item)
+    vendors.each_with_index do |vendor, i|
+      if vendors.count == 1
+        vendor.inventory[item] >= amount
+        vendor.inventory[item] -= amount
+        answer = true
+      elsif vendors.count == 0
+        answer = false
+      else
+        if vendor.inventory[item] >= amount && vendors[i +1].check_stock(item) > 0
+          vendor.inventory[item] -= amount
+          first_vendor = vendor.inventory.values_at(item)
+          remaining = amount - first_vendor[0]
+          if vendor.inventory[item] <= 0 && remaining < 0
+            vendors[i + 1].inventory[item] -= remaining
+          end
+          answer = true
+        elsif vendor.inventory[item] >= amount
+          vendor.inventory[item] -= amount
+          answer = true
+
+        elsif vendor.inventory[item] <= amount && vendors[i +1].check_stock(item) > 0
+          vendors[i +1].inventory[item] -= amount
+          answer = true
+        else
+          answer = false
+        end
+      end
+      answer
+    end
+    answer
+  end
+
 end
