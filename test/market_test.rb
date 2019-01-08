@@ -127,4 +127,92 @@ class MarketTest < Minitest::Test
     assert_equal expected, market.total_inventory
   end
 
+  def test_it_can_sell_from_vendors_in_order
+    market = Market.new("South Pearl Street Farmers Market")
+    #=> #<Market:0x00007fe134933e20...>
+    vendor_1 = Vendor.new("Rocky Mountain Fresh")
+    #=> #<Vendor:0x00007fe1348a1160...>
+    vendor_1.stock("Peaches", 35)
+    vendor_1.stock("Tomatoes", 7)
+    vendor_2 = Vendor.new("Ba-Nom-a-Nom")
+    #=> #<Vendor:0x00007fe1349bed40...>
+    vendor_2.stock("Banana Nice Cream", 50)
+    vendor_2.stock("Peach-Raspberry Nice Cream", 25)
+    vendor_3 = Vendor.new("Palisade Peach Shack")
+    #=> #<Vendor:0x00007fe134910650...>
+    vendor_3.stock("Peaches", 65)
+    market.add_vendor(vendor_1)
+    market.add_vendor(vendor_2)
+    market.add_vendor(vendor_3)
+
+    assert_equal false, market.sell("Peaches", 200)
+    #=> false
+  end
+
+  def test_it_can_refuse_sale_if_no_inventory
+    market = Market.new("South Pearl Street Farmers Market")
+    #=> #<Market:0x00007fe134933e20...>
+    vendor_1 = Vendor.new("Rocky Mountain Fresh")
+    #=> #<Vendor:0x00007fe1348a1160...>
+    vendor_1.stock("Peaches", 35)
+    vendor_1.stock("Tomatoes", 7)
+    vendor_2 = Vendor.new("Ba-Nom-a-Nom")
+    #=> #<Vendor:0x00007fe1349bed40...>
+    vendor_2.stock("Banana Nice Cream", 50)
+    vendor_2.stock("Peach-Raspberry Nice Cream", 25)
+    vendor_3 = Vendor.new("Palisade Peach Shack")
+    #=> #<Vendor:0x00007fe134910650...>
+    vendor_3.stock("Peaches", 65)
+    market.add_vendor(vendor_1)
+    market.add_vendor(vendor_2)
+    market.add_vendor(vendor_3)
+    assert_equal false, market.sell("Onions", 1)
+    #=> false
+  end
+
+  def test_it_can_sell_another_item_in_order
+    market = Market.new("South Pearl Street Farmers Market")
+    #=> #<Market:0x00007fe134933e20...>
+    vendor_1 = Vendor.new("Rocky Mountain Fresh")
+    #=> #<Vendor:0x00007fe1348a1160...>
+    vendor_1.stock("Peaches", 35)
+    vendor_1.stock("Tomatoes", 7)
+    vendor_2 = Vendor.new("Ba-Nom-a-Nom")
+    #=> #<Vendor:0x00007fe1349bed40...>
+    vendor_2.stock("Banana Nice Cream", 50)
+    vendor_2.stock("Peach-Raspberry Nice Cream", 25)
+    vendor_3 = Vendor.new("Palisade Peach Shack")
+    #=> #<Vendor:0x00007fe134910650...>
+    vendor_3.stock("Peaches", 65)
+    market.add_vendor(vendor_1)
+    market.add_vendor(vendor_2)
+    market.add_vendor(vendor_3)
+
+    assert_equal true, market.sell("Banana Nice Cream", 5)
+    assert_equal 45, vendor_2.check_stock("Banana Nice Cream")
+  end
+
+  def test_another_selling_scenario
+    market = Market.new("South Pearl Street Farmers Market")
+    #=> #<Market:0x00007fe134933e20...>
+    vendor_1 = Vendor.new("Rocky Mountain Fresh")
+    #=> #<Vendor:0x00007fe1348a1160...>
+    vendor_1.stock("Peaches", 35)
+    vendor_1.stock("Tomatoes", 7)
+    vendor_2 = Vendor.new("Ba-Nom-a-Nom")
+    #=> #<Vendor:0x00007fe1349bed40...>
+    vendor_2.stock("Banana Nice Cream", 50)
+    vendor_2.stock("Peach-Raspberry Nice Cream", 25)
+    vendor_3 = Vendor.new("Palisade Peach Shack")
+    #=> #<Vendor:0x00007fe134910650...>
+    vendor_3.stock("Peaches", 65)
+    market.add_vendor(vendor_1)
+    market.add_vendor(vendor_2)
+    market.add_vendor(vendor_3)
+
+    assert_equal true, market.sell("Peaches", 40)
+    assert_equal 0, vendor_1.check_stock("Peaches")
+    assert_equal 60, vendor_3.check_stock("Peaches")
+  end
+
 end
